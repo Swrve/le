@@ -37,6 +37,7 @@ USER_KEY_PARAM = 'user-key'
 AGENT_KEY_PARAM = 'agent-key'
 FILTERS_PARAM = 'filters'
 FORMATTER_PARAM = 'formatter'
+CUSTOM_FORMAT_PARAM = 'custom-format'
 SUPPRESS_SSL_PARAM = 'suppress_ssl'
 USE_CA_PROVIDED_PARAM = 'use_ca_provided'
 FORCE_DOMAIN_PARAM = 'force_domain'
@@ -1687,6 +1688,7 @@ class Config(object):
         self.daemon = False
         self.filters = NOT_SET
         self.formatter = NOT_SET
+        self.custom_format = NOT_SET
         self.force = False
         self.hostname = NOT_SET
         self.name = NOT_SET
@@ -1776,6 +1778,7 @@ class Config(object):
                 AGENT_KEY_PARAM: '',
                 FILTERS_PARAM: '',
                 FORMATTER_PARAM: '',
+                CUSTOM_FORMAT_PARAM: '',
                 SUPPRESS_SSL_PARAM: '',
                 FORCE_DOMAIN_PARAM: '',
                 USE_CA_PROVIDED_PARAM: '',
@@ -1803,6 +1806,10 @@ class Config(object):
                 new_formatter = conf.get(MAIN_SECT, FORMATTER_PARAM)
                 if new_formatter != '':
                     self.formatter = new_formatter
+            if self.custom_format == NOT_SET:
+                new_custom_format = conf.get(MAIN_SECT, CUSTOM_FORMAT_PARAM)
+                if new_custom_format != '':
+                    self.custom_format = new_custom_format
             if self.hostname == NOT_SET:
                 self.hostname = conf.get(MAIN_SECT, HOSTNAME_PARAM)
                 if not self.hostname:
@@ -1889,6 +1896,8 @@ class Config(object):
                 conf.set(MAIN_SECT, FILTERS_PARAM, self.filters)
             if self.formatter != NOT_SET:
                 conf.set(MAIN_SECT, FORMATTER_PARAM, self.formatter)
+            if self.custom_format != NOT_SET:
+                conf.set(MAIN_SECT, CUSTOM_FORMAT_PARAM, self.custom_format)
             if self.hostname != NOT_SET:
                 conf.set(MAIN_SECT, HOSTNAME_PARAM, self.hostname)
             if self.suppress_ssl:
@@ -2701,7 +2710,9 @@ def start_followers(default_transport):
             log.info("Following %s", log_filename)
 
             if log_token or config.datahub:
-                if config.formatter == 'plain':
+                if config.custom_format != NOT_SET:
+                    formatter = formatters.FormatCustom(config.custom_format, config.hostname, log_name, log_token)
+                elif config.formatter == 'plain':
                     formatter = formatters.FormatPlain(log_token)
                 elif config.formatter == 'syslog' or config.formatter == NOT_SET:
                     formatter = formatters.FormatSyslog(config.hostname, log_name, log_token)

@@ -57,7 +57,7 @@ class FormatCustom(object):
     {line}: the log line."""
 
     def __init__(self, format, hostname, appname, token):
-       self._format = format
+        self._format = format
         if hostname:
             self._hostname = hostname
         else:

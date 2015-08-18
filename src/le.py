@@ -2710,7 +2710,7 @@ def start_followers(default_transport):
             log.info("Following %s", log_filename)
 
             if log_token or config.datahub:
-                if config.custom_format != NOT_SET:
+                if config.formatter == 'custom':
                     formatter = formatters.FormatCustom(config.custom_format, config.hostname, log_name, log_token)
                 elif config.formatter == 'plain':
                     formatter = formatters.FormatPlain(log_token)
